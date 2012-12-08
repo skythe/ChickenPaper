@@ -23,9 +23,9 @@ def chicken(word):
         return toReturn
 
 
-def process(someFile):
+def process(someFile, isPreamble=True):
         retlist = []
-        chickenTime = False;
+        chickenTime = not isPreamble; #if there's no preamble, it's already chicken time
         for line in someFile:
                 word = ""
                 newline = ""
@@ -35,9 +35,11 @@ def process(someFile):
                         retlist.append(line)
                         if "begin{document}" in line:
                                 chickenTime = True
-                elif "end{document}" in line:
+                                print("beginning chickening process")
+                elif "\\end{" in line or "\\begin{" in line or "\\pagestyle{" in line: #TODO width=
+                #sorts of settings and graphics in general
                                 retlist.append(line)
-                                chickenTime = False
+                                #chickenTime = False TODO logic?
                 else: #chicken
                         for char in line:
                                 if char.isalpha() or char == "\\":
@@ -61,15 +63,26 @@ def process(someFile):
         return retlist
 
 
+#run stuff; fix thsi too
 from sys import argv
 
-inFile = open(argv[1], 'r')
-out = open("chicken-"+argv[1], 'w')
-fileAsList = inFile.readlines()
 
-chickened = process(fileAsList)
+if len(argv) < 2:
+        print ("error: syntax is: chicken.py filename --nopreamble")
+else:
+        
+        inFile = open(argv[1], 'r')
+        out = open("chicken-"+argv[1], 'w')
+        fileAsList = inFile.readlines()
 
-for line in chickened:
-        out.write(line)
+        if len(argv) == 2:
+                chickened = process(fileAsList, True)
+        else: #assuming equals --nopreamble or --nopa; TODO is fix this assumption
+                chickened = process(fileAsList, False)
+
+        for line in chickened:
+                out.write(line)
+
+
 
 
